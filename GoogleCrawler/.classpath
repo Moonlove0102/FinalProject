@@ -3,6 +3,8 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry excluding="src/" kind="src" path=""/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="/Users/Moonlove/Downloads/jsoup-1.7.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Moonlove/Downloads/google-gson-2.2.4-release/jsoup-1.7.3.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Moonlove/Downloads/google-gson-2.2.4-release/jsoup-1.7.3-javadoc.jar"/>
+	<classpathentry kind="lib" path="C:/Users/Moonlove/Downloads/google-gson-2.2.4-release/jsoup-1.7.3-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

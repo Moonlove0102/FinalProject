@@ -27,6 +27,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
@@ -122,6 +123,24 @@ public class AWTGoogleCrawler extends JFrame{
 				pack();
 			}
 		});
+        //This Section is for testing of Web crawler
+        try {
+			Document Html=Jsoup.connect("http://www.amazon.com/Data-Mining-Concepts-Techniques-Management/dp/0123814790").userAgent("Mozilla/5.0").timeout(30000).get();
+			
+			Elements WebContent=Html.select("span.rentPrice");
+			for(Element table:WebContent)
+			{
+				System.out.println(table.html());
+			}
+			
+		} catch (IOException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+        
+        
+        
+        //This Section is for testing of Web crawler
         GridBagConstraints cNorth = new GridBagConstraints();
         cNorth.weightx=1.0;
         cNorth.fill=GridBagConstraints.HORIZONTAL;
