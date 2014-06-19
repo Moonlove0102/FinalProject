@@ -10,12 +10,10 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 
 import javax.swing.BorderFactory;
-import javax.swing.BoundedRangeModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
@@ -27,26 +25,26 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 
-public class AWTGoogleCrawler extends JFrame{
+public class BooksFinder extends JFrame{
 	private JLabel keywordsLabel;
 	private JTextField keywords;
-	private JButton searchBtn;
+	private JButton searchBooks;
+	private JButton searchEbooks;
 	private JPanel controls;
 	private JPanel Results;
 	private JPanel leftPanel;
 	private JPanel rightPanel;
 	private JPanel southPanel;
-	private String GoogleSearch="http://www.google.com/search?q=";
-//	private String charset="UTF-8";
+	
+	private String charset="UTF-8";
 	private String userAgent="Moonlove";
 	private String url="";
 	private JTextArea searchResults;
-	public AWTGoogleCrawler()
+	public BooksFinder()
 	{
 		initUI();
 	}
@@ -58,7 +56,8 @@ public class AWTGoogleCrawler extends JFrame{
         southPanel = new JPanel(new GridBagLayout());
         
         Results.setBorder(new TitledBorder(new EtchedBorder(),"Search Results"));
-        searchBtn=new JButton("Search");
+        searchBooks=new JButton("Purchase Book");
+        searchEbooks=new JButton("Search EBook");
         keywordsLabel=new JLabel("Keyword: ");
         keywords=new JTextField("Enter keywords here.");
                
@@ -89,17 +88,16 @@ public class AWTGoogleCrawler extends JFrame{
 				
 			}
 		});
-        searchBtn.addActionListener(new ActionListener() {
+        searchBooks.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				String charset="UTF-8";
 				if(!searchResults.isVisible())
 					searchResults.setVisible(true);
 				for(int i=0;i<100;i+=10)
 				{
 					try {
-						Elements links=Jsoup.connect(GoogleSearch+URLEncoder.encode(keywords.getText(), charset)+"&start="+i).userAgent(userAgent).get().select("li.g>h3>a");
+						Elements links=Jsoup.connect(SearchURL.GoogleSearch+URLEncoder.encode(keywords.getText(), charset)+"&start="+i).userAgent(userAgent).get().select("li.g>h3>a");
 						for(Element link:links)
 						{
 							String title=link.text();
@@ -124,19 +122,19 @@ public class AWTGoogleCrawler extends JFrame{
 			}
 		});
         //This Section is for testing of Web crawler
-        try {
-			Document Html=Jsoup.connect("http://www.amazon.com/Data-Mining-Concepts-Techniques-Management/dp/0123814790").userAgent("Mozilla/5.0").timeout(30000).get();
-			
-			Elements WebContent=Html.select("span.rentPrice");
-			for(Element table:WebContent)
-			{
-				System.out.println(table.html());
-			}
-			
-		} catch (IOException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//        try {
+//			Document Html=Jsoup.connect("http://www.amazon.com/Data-Mining-Concepts-Techniques-Management/dp/0123814790").userAgent("Mozilla/5.0").timeout(30000).get();
+//			
+//			Elements WebContent=Html.select("span.rentPrice");
+//			for(Element table:WebContent)
+//			{
+//				System.out.println(table.html());
+//			}
+//			
+//		} catch (IOException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
         
         
         
@@ -154,7 +152,8 @@ public class AWTGoogleCrawler extends JFrame{
         controls.add(new JPanel());
         controls.add(keywordsLabel);
         controls.add(keywords,cNorth);
-        controls.add(searchBtn);          
+        controls.add(searchBooks);
+        controls.add(searchEbooks);
         controls.add(new JPanel());
         
         leftPanel.add(new JPanel());
@@ -176,7 +175,7 @@ public class AWTGoogleCrawler extends JFrame{
 			
 			@Override
 			public void run() {
-				new AWTGoogleCrawler().setVisible(true);				
+				new BooksFinder().setVisible(true);				
 			}
 		});
 
