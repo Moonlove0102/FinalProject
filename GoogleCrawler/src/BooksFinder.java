@@ -6,6 +6,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
@@ -25,8 +26,14 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
+import org.jsoup.nodes.Entities.EscapeMode;
 import org.jsoup.select.Elements;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 
 public class BooksFinder extends JFrame{
@@ -107,7 +114,7 @@ public class BooksFinder extends JFrame{
 							if(!linkURL.startsWith("http"))
 								continue;
 							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
-							searchResults.setText(searchResults.getText()+"URL: : "+linkURL+"\n");
+							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
 						
 						}
 					} catch (UnsupportedEncodingException e1) {
@@ -119,6 +126,145 @@ public class BooksFinder extends JFrame{
 					}
 				}
 				pack();
+			}
+		});
+        searchEbooks.addActionListener(new ActionListener() {
+			
+        	@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!searchResults.isVisible())
+					searchResults.setVisible(true);
+				//Eslite
+				try {
+						
+						Document Html=Jsoup.connect(SearchURL.EsliteSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
+						Elements links=Html.select("td.name>h3>a>span");
+						Elements productPrice=Html.select("td.summary>span.price_sale");
+						searchResults.setText("誠品網路書店: \n");
+						for(int i =0;i<links.size();i++)
+						{
+							String title=links.get(i).html();
+							String price=productPrice.get(i).html();
+							if(price.contains("折"))
+							{
+								productPrice.remove(i);
+								price=productPrice.get(i).html();
+							}
+							if(title.contains(keywords.getText()))
+							{
+								title=title.replace("<em>", "");
+								title=title.replace("</em>", "");
+								searchResults.setText(searchResults.getText()+"\tTitle: "+title+"\n");
+								searchResults.setText(searchResults.getText()+"\tPrice: : "+price+"\n");
+							}		
+						}
+					} catch (UnsupportedEncodingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				//KingStone
+				try {
+					String urlEncodedKeyword=URLEncoder.encode(keywords.getText(), charset);
+					urlEncodedKeyword=urlEncodedKeyword.replace("%", "%25");
+					searchResults.setText(searchResults.getText()+"\n金石堂網路書店: \n");
+					Document Html=Jsoup.connect(SearchURL.KingStoneSearch+urlEncodedKeyword).userAgent("Mozilla/5.0").timeout(30000).get();
+					Elements links=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
+					Elements productPrice=Html.select("li>span.price>span.sale_price");					
+					
+					for (int i = 0; i < links.size(); i++) {
+						String title = links.get(i).html();
+						
+						String price = null;
+//						if (title.contains(keywords.getText())) {
+							if (i < productPrice.size()) {
+								price = productPrice.get(i).html();
+								price = price.replace("<em>", "");
+								price = price.replace("</em>", "");
+								searchResults.setText(searchResults.getText()
+										+ "\tTitle: " + title + "\n");
+								searchResults.setText(searchResults.getText()
+										+ "\tPrice: " + price + "\n");
+							}
+//						}
+					}
+				}catch(SocketTimeoutException e1)
+				{
+					searchResults.setText(searchResults.getText()
+							+ "\tConnection TimeOut !!\n");
+				}
+				catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//PCHomeSearch
+				try {				
+					searchResults.setText(searchResults.getText()+"\nPCHOME網路書店: \n");
+					Document Html=Jsoup.connect(SearchURL.PCHomeSearch+URLEncoder.encode(keywords.getText(), charset)).ignoreContentType(true).userAgent("Mozilla/5.0").timeout(30000).get();
+					JsonObject contentTemp = ResponceFromJSON(Html);
+					String title=contentTemp.get("name").toString();
+					String price=contentTemp.get("price").toString();
+					title=title.replace("\"", "");
+					price=price.replace("\"", "");
+					searchResults.setText(searchResults.getText()
+							+ "\tTitle: " + title + "\n");
+					searchResults.setText(searchResults.getText()
+							+ "\tPrice: " + price + "\n");
+					
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//Books.com
+				try {
+					
+					Document Html=Jsoup.connect(SearchURL.BooksSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
+					Elements links=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
+					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price>strong>b");
+					searchResults.setText(searchResults.getText()+"\n博客來網路書店: \n");
+					for(Element link :links)
+					{
+						String title=link.html();
+						String price=productPrice.get(1).html();
+						if(title.contains(keywords.getText()))
+						{
+								title=title.replace("<em>", "");
+								title=title.replace("</em>", "");
+								searchResults.setText(searchResults.getText()+"\tTitle: "+title+"\n");
+								searchResults.setText(searchResults.getText()+"\tPrice: : "+price+"\n");
+						}
+					}
+				} catch (UnsupportedEncodingException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					// TODO Auto-generated catch block
+					e1.printStackTrace();
+				}
+				//Book Store End
+				pack();
+			}
+
+			private JsonObject ResponceFromJSON(Document Html) {
+				String htmlBodyString=Html.body().toString();
+				htmlBodyString=htmlBodyString.replace("<body>", "");
+				htmlBodyString=htmlBodyString.replace("</body>", "");
+				htmlBodyString=htmlBodyString.replace("&quot;", "\"");
+				
+				JsonParser parser = new JsonParser();
+				JsonObject contentJSON = (JsonObject)parser.parse(htmlBodyString);
+				JsonArray contentProds=(JsonArray)parser.parse(contentJSON.get("prods").toString());
+				JsonObject contentTemp=(JsonObject)parser.parse(contentProds.get(0).toString());
+//					System.out.println(contentTemp.get("name"));
+				return contentTemp;
 			}
 		});
         //This Section is for testing of Web crawler
