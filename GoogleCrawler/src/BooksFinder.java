@@ -252,6 +252,10 @@ public class BooksFinder extends JFrame{
 							linkURL=URLDecoder.decode(linkURL.substring(linkURL.indexOf('=')+1, linkURL.indexOf('&')),"UTF-8");
 							if(!linkURL.startsWith("http"))
 								continue;
+							if(linkURL.indexOf("amazon") != -1)
+								continue;
+							if(linkURL.indexOf("Ebookee") != -1)
+								continue;
 							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
 							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
 						
