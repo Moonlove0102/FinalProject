@@ -250,11 +250,17 @@ public class BooksFinder extends JFrame{
 							String linkURL=link.absUrl("href");
 						
 							linkURL=URLDecoder.decode(linkURL.substring(linkURL.indexOf('=')+1, linkURL.indexOf('&')),"UTF-8");
+							String dirtyWords[];
+							dirtyWords = new String[] {"amazon","Ebookee","tenlong","books.com.tw","wikipedia.org"};
 							if(!linkURL.startsWith("http"))
 								continue;
-							if(linkURL.indexOf("amazon") != -1)
-								continue;
-							if(linkURL.indexOf("Ebookee") != -1)
+							boolean flag = false;
+							for(String s:dirtyWords)
+							{
+								if(linkURL.indexOf(s) != -1)
+									flag = true;
+							}
+							if(flag)
 								continue;
 							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
 							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
