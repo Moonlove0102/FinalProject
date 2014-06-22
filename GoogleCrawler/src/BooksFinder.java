@@ -96,40 +96,7 @@ public class BooksFinder extends JFrame{
 			}
 		});
         searchBooks.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				if(!searchResults.isVisible())
-					searchResults.setVisible(true);
-				for(int i=0;i<100;i+=10)
-				{
-					try {
-						Elements links=Jsoup.connect(SearchURL.GoogleSearch+URLEncoder.encode(keywords.getText(), charset)+"&start="+i).userAgent(userAgent).get().select("li.g>h3>a");
-						for(Element link:links)
-						{
-							String title=link.text();
-							String linkURL=link.absUrl("href");
-						
-							linkURL=URLDecoder.decode(linkURL.substring(linkURL.indexOf('=')+1, linkURL.indexOf('&')),"UTF-8");
-							if(!linkURL.startsWith("http"))
-								continue;
-							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
-							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
-						
-						}
-					} catch (UnsupportedEncodingException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					}
-				}
-				pack();
-			}
-		});
-        searchEbooks.addActionListener(new ActionListener() {
-			
+
         	@Override
 			public void actionPerformed(ActionEvent e) {
 				if(!searchResults.isVisible())
@@ -140,12 +107,12 @@ public class BooksFinder extends JFrame{
 						Document Html=Jsoup.connect(SearchURL.EsliteSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
 						Elements links=Html.select("td.name>h3>a>span");
 						Elements productPrice=Html.select("td.summary>span.price_sale");
-						searchResults.setText("∏€´~∫Ù∏ÙÆ—©±: \n");
+						searchResults.setText("Ë™†ÂìÅÁ∂≤Ë∑ØÊõ∏Â∫ó: \n");
 						for(int i =0;i<links.size();i++)
 						{
 							String title=links.get(i).html();
 							String price=productPrice.get(i).html();
-							if(price.contains("ßÈ"))
+							if(price.contains("Êäò"))
 							{
 								productPrice.remove(i);
 								price=productPrice.get(i).html();
@@ -169,7 +136,7 @@ public class BooksFinder extends JFrame{
 				try {
 					String urlEncodedKeyword=URLEncoder.encode(keywords.getText(), charset);
 					urlEncodedKeyword=urlEncodedKeyword.replace("%", "%25");
-					searchResults.setText(searchResults.getText()+"\n™˜•€∞Û∫Ù∏ÙÆ—©±: \n");
+					searchResults.setText(searchResults.getText()+"\nÈáëÁü≥Â†ÇÁ∂≤Ë∑ØÊõ∏Â∫ó: \n");
 					Document Html=Jsoup.connect(SearchURL.KingStoneSearch+urlEncodedKeyword).userAgent("Mozilla/5.0").timeout(30000).get();
 					Elements links=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
 					Elements productPrice=Html.select("li>span.price>span.sale_price");					
@@ -204,7 +171,7 @@ public class BooksFinder extends JFrame{
 				}
 				//PCHomeSearch
 				try {				
-					searchResults.setText(searchResults.getText()+"\nPCHOME∫Ù∏ÙÆ—©±: \n");
+					searchResults.setText(searchResults.getText()+"\nPCHOMEÁ∂≤Ë∑ØÊõ∏Â∫ó: \n");
 					Document Html=Jsoup.connect(SearchURL.PCHomeSearch+URLEncoder.encode(keywords.getText(), charset)).ignoreContentType(true).userAgent("Mozilla/5.0").timeout(30000).get();
 					JsonObject contentTemp = ResponceFromJSON(Html);
 					String title=contentTemp.get("name").toString();
@@ -229,7 +196,7 @@ public class BooksFinder extends JFrame{
 					Document Html=Jsoup.connect(SearchURL.BooksSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
 					Elements links=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
 					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price>strong>b");
-					searchResults.setText(searchResults.getText()+"\n≥’´»®”∫Ù∏ÙÆ—©±: \n");
+					searchResults.setText(searchResults.getText()+"\nÂçöÂÆ¢‰æÜÁ∂≤Ë∑ØÊõ∏Â∫ó: \n");
 					for(Element link :links)
 					{
 						String title=link.html();
@@ -265,6 +232,39 @@ public class BooksFinder extends JFrame{
 				JsonObject contentTemp=(JsonObject)parser.parse(contentProds.get(0).toString());
 //					System.out.println(contentTemp.get("name"));
 				return contentTemp;
+			}
+		});
+        searchEbooks.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if(!searchResults.isVisible())
+					searchResults.setVisible(true);
+				for(int i=0;i<100;i+=10)
+				{
+					try {
+						Elements links=Jsoup.connect(SearchURL.GoogleSearch+URLEncoder.encode(keywords.getText(), charset)+"&start="+i).userAgent(userAgent).get().select("li.g>h3>a");
+						for(Element link:links)
+						{
+							String title=link.text();
+							String linkURL=link.absUrl("href");
+						
+							linkURL=URLDecoder.decode(linkURL.substring(linkURL.indexOf('=')+1, linkURL.indexOf('&')),"UTF-8");
+							if(!linkURL.startsWith("http"))
+								continue;
+							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
+							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
+						
+						}
+					} catch (UnsupportedEncodingException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
+				}
+				pack();
 			}
 		});
         //This Section is for testing of Web crawler
