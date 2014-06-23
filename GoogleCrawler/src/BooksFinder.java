@@ -55,6 +55,7 @@ public class BooksFinder extends JFrame{
 	{
 		initUI();
 	}
+	
 	private void initUI() { 
         controls = new JPanel(new GridBagLayout());
         Results=new JPanel(new GridBagLayout());
@@ -105,13 +106,21 @@ public class BooksFinder extends JFrame{
 				try {
 						
 						Document Html=Jsoup.connect(SearchURL.EsliteSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
-						Elements links=Html.select("td.name>h3>a>span");
+						Elements productName=Html.select("td.name>h3>a>span");
 						Elements productPrice=Html.select("td.summary>span.price_sale");
+						Elements productURL=Html.select("td.name>h3");
 						searchResults.setText("誠品網路書店: \n");
-						for(int i =0;i<links.size();i++)
+						for(int i =0;i<productName.size();i++)
 						{
-							String title=links.get(i).html();
+							String title=productName.get(i).html();
 							String price=productPrice.get(i).html();
+							//makeURL
+							String url=productURL.get(i).html();
+							String baseURL=productURL.get(i).baseUri();
+							baseURL=baseURL.substring(0, baseURL.indexOf("com/")+4);							
+							String href=url.substring(url.indexOf("\"")+1,url.indexOf(">")-1);
+							//makeURL
+							url=baseURL+href;
 							if(price.contains("折"))
 							{
 								productPrice.remove(i);
@@ -122,7 +131,8 @@ public class BooksFinder extends JFrame{
 								title=title.replace("<em>", "");
 								title=title.replace("</em>", "");
 								searchResults.setText(searchResults.getText()+"\tTitle: "+title+"\n");
-								searchResults.setText(searchResults.getText()+"\tPrice: : "+price+"\n");
+								searchResults.setText(searchResults.getText()+"\tPrice: "+price+"\n");
+								searchResults.setText(searchResults.getText()+"\tUrl: "+url+"\n");
 							}		
 						}
 					} catch (UnsupportedEncodingException e1) {
@@ -138,12 +148,19 @@ public class BooksFinder extends JFrame{
 					urlEncodedKeyword=urlEncodedKeyword.replace("%", "%25");
 					searchResults.setText(searchResults.getText()+"\n金石堂網路書店: \n");
 					Document Html=Jsoup.connect(SearchURL.KingStoneSearch+urlEncodedKeyword).userAgent("Mozilla/5.0").timeout(30000).get();
-					Elements links=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
+					Elements productName=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
+					Elements productURL=Html.select("li>a.anchor[title*="+keywords.getText()+"]");
 					Elements productPrice=Html.select("li>span.price>span.sale_price");					
-					
-					for (int i = 0; i < links.size(); i++) {
-						String title = links.get(i).html();
-						
+					Elements q=productURL.parents();
+					for (int i = 0; i < productName.size(); i++) {
+						String title = productName.get(i).html();
+						//makeURL
+						String url=productURL.get(i).toString();
+						String baseURL=productURL.get(i).baseUri();
+						baseURL=baseURL.substring(0, baseURL.indexOf("tw/")+3);
+						String href=url.substring(url.indexOf("href=")+7,url.indexOf(">")-1);
+						url=baseURL+href;
+						//makeURL
 						String price = null;
 //						if (title.contains(keywords.getText())) {
 							if (i < productPrice.size()) {
@@ -154,6 +171,8 @@ public class BooksFinder extends JFrame{
 										+ "\tTitle: " + title + "\n");
 								searchResults.setText(searchResults.getText()
 										+ "\tPrice: " + price + "\n");
+								searchResults.setText(searchResults.getText()
+										+ "\tUrl: " + url + "\n");
 							}
 //						}
 					}
@@ -176,12 +195,18 @@ public class BooksFinder extends JFrame{
 					JsonObject contentTemp = ResponceFromJSON(Html);
 					String title=contentTemp.get("name").toString();
 					String price=contentTemp.get("price").toString();
+					String productID=contentTemp.get("Id").toString();
+					String baseURL="http://24h.pchome.com.tw/books/prod/";					
 					title=title.replace("\"", "");
 					price=price.replace("\"", "");
+					productID=productID.replaceAll("\"", "");
+					String url=baseURL+productID;
 					searchResults.setText(searchResults.getText()
 							+ "\tTitle: " + title + "\n");
 					searchResults.setText(searchResults.getText()
 							+ "\tPrice: " + price + "\n");
+					searchResults.setText(searchResults.getText()
+							+ "\tUrl: " + url + "\n");
 					
 				} catch (UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
@@ -194,19 +219,25 @@ public class BooksFinder extends JFrame{
 				try {
 					
 					Document Html=Jsoup.connect(SearchURL.BooksSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
-					Elements links=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
+					Elements productName=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
+					Elements productURL=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
 					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price>strong>b");
 					searchResults.setText(searchResults.getText()+"\n博客來網路書店: \n");
-					for(Element link :links)
+					String baseUrl="http://www.books.com.tw/products/";
+					for(Element link :productName)
 					{
 						String title=link.html();
 						String price=productPrice.get(1).html();
+						String url=productURL.get(0).toString();
+						url=url.substring(url.indexOf("item=")+5, url.indexOf("&amp;page"));
+						url=baseUrl+url;
 						if(title.contains(keywords.getText()))
 						{
 								title=title.replace("<em>", "");
 								title=title.replace("</em>", "");
 								searchResults.setText(searchResults.getText()+"\tTitle: "+title+"\n");
-								searchResults.setText(searchResults.getText()+"\tPrice: : "+price+"\n");
+								searchResults.setText(searchResults.getText()+"\tPrice: "+price+"\n");
+								searchResults.setText(searchResults.getText()+"\tUrl: "+url+"\n");
 						}
 					}
 				} catch (UnsupportedEncodingException e1) {
@@ -277,21 +308,7 @@ public class BooksFinder extends JFrame{
 				pack();
 			}
 		});
-        //This Section is for testing of Web crawler
-//        try {
-//			Document Html=Jsoup.connect("http://www.amazon.com/Data-Mining-Concepts-Techniques-Management/dp/0123814790").userAgent("Mozilla/5.0").timeout(30000).get();
-//			
-//			Elements WebContent=Html.select("span.rentPrice");
-//			for(Element table:WebContent)
-//			{
-//				System.out.println(table.html());
-//			}
-//			
-//		} catch (IOException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
-        
+
         
         
         //This Section is for testing of Web crawler
