@@ -288,6 +288,7 @@ public class BooksFinder extends JFrame{
 
 			@Override
 			public void actionPerformed(ActionEvent e) {
+				searchResults.setText("");
 				if(!searchResults.isVisible())
 					searchResults.setVisible(true);
 				for(int i=0;i<100;i+=10)
