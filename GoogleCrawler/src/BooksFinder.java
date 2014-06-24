@@ -314,7 +314,7 @@ public class BooksFinder extends JFrame{
 							if(flag)
 								continue;
 							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
-							searchResults.setText(searchResults.getText()+"Price: "+linkURL+"\n");
+							searchResults.setText(searchResults.getText()+"url: "+linkURL+"\n");
 						
 						}
 					} catch (UnsupportedEncodingException e1) {
