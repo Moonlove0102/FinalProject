@@ -153,13 +153,20 @@ public class BooksFinder extends JFrame{
 					urlEncodedKeyword=urlEncodedKeyword.replace("%", "%25");
 					searchResults.setText(searchResults.getText()+"\n金石堂網路書店: \n");
 					Document Html=Jsoup.connect(SearchURL.KingStoneSearch+urlEncodedKeyword).userAgent("Mozilla/5.0").timeout(30000).get();
-					Elements productName=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
-					Elements productURL=Html.select("li>a.anchor[title*="+keywords.getText()+"]");
-					Elements productPrice=Html.select("li>span.price>span.sale_price");					
-					int redundantPrice=productPrice.size()-productName.size();
-					for(int i=0;i<redundantPrice;i++)
+					Elements productName=Html.select("div.box.row_list>ul>li>a.anchor>span");
+					Elements productURL=Html.select("div.box.row_list>ul>li>a.anchor");
+					Elements productPrice=Html.select("li>span.price>span.sale_price");
+					int product_number=productName.size();
+//					System.out.println(productName.size());
+					for(int i=0;i<productName.size();i++)
 					{
-						productPrice.remove(0);
+//						System.out.println(productName.get(i).text());
+//						System.out.println(productPrice.get(i).text());
+						if(!(productName.get(i).text()).contains(keywords.getText()))
+						{
+							productName.remove(i);
+							productPrice.remove(i);
+						}
 					}
 					for (int i = 0; i < productName.size(); i++) {
 						String title = productName.get(i).html();
@@ -215,7 +222,7 @@ public class BooksFinder extends JFrame{
 						searchResults.setText(searchResults.getText()
 								+ "\tTitle: " + title + "\n");
 						searchResults.setText(searchResults.getText()
-								+ "\tPrice: " + price + "\n");
+								+ "\tPrice: " + price + "元\n");
 						searchResults.setText(searchResults.getText()
 								+ "\tUrl: " + url + "\n");
 					}
