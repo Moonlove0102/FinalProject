@@ -108,7 +108,6 @@ public class BooksFinder extends JFrame{
 						Document Html=Jsoup.connect(SearchURL.EsliteSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
 						Elements productName=Html.select("td.name>h3>a>span");
 						Elements productPrice=Html.select("td.summary>span.price_sale");
-						System.out.println(productName.size());
 						for(int i=0;i<productPrice.size();i++)
 						{
 							String temp=productPrice.get(i).html();
@@ -202,21 +201,25 @@ public class BooksFinder extends JFrame{
 				try {				
 					searchResults.setText(searchResults.getText()+"\nPCHOME網路書店: \n");
 					Document Html=Jsoup.connect(SearchURL.PCHomeSearch+URLEncoder.encode(keywords.getText(), charset)).ignoreContentType(true).userAgent("Mozilla/5.0").timeout(30000).get();
-					JsonObject contentTemp = ResponceFromJSON(Html);
-					String title=contentTemp.get("name").toString();
-					String price=contentTemp.get("price").toString();
-					String productID=contentTemp.get("Id").toString();
-					String baseURL="http://24h.pchome.com.tw/books/prod/";					
-					title=title.replace("\"", "");
-					price=price.replace("\"", "");
-					productID=productID.replaceAll("\"", "");
-					String url=baseURL+productID;
-					searchResults.setText(searchResults.getText()
-							+ "\tTitle: " + title + "\n");
-					searchResults.setText(searchResults.getText()
-							+ "\tPrice: " + price + "\n");
-					searchResults.setText(searchResults.getText()
-							+ "\tUrl: " + url + "\n");
+					String baseURL="http://24h.pchome.com.tw/books/prod/";
+					JsonObject []contentTemp = ResponceFromJSON(Html);
+					for(int i=0;i<contentTemp.length;i++)
+					{
+						String title=contentTemp[i].get("name").toString();
+						String price=contentTemp[i].get("price").toString();
+						String productID=contentTemp[i].get("Id").toString();											
+						title=title.replace("\"", "");
+						price=price.replace("\"", "");
+						productID=productID.replaceAll("\"", "");
+						String url=baseURL+productID;
+						searchResults.setText(searchResults.getText()
+								+ "\tTitle: " + title + "\n");
+						searchResults.setText(searchResults.getText()
+								+ "\tPrice: " + price + "\n");
+						searchResults.setText(searchResults.getText()
+								+ "\tUrl: " + url + "\n");
+					}
+					
 					
 				} catch (UnsupportedEncodingException e1) {
 					// TODO Auto-generated catch block
@@ -231,13 +234,18 @@ public class BooksFinder extends JFrame{
 					Document Html=Jsoup.connect(SearchURL.BooksSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
 					Elements productName=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
 					Elements productURL=Html.select("form.result>ul.searchbook>li.item>h3>a[title*="+keywords.getText()+"]");
-					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price>strong>b");
+					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price");
 					searchResults.setText(searchResults.getText()+"\n博客來網路書店: \n");
 					String baseUrl="http://www.books.com.tw/products/";
-					for(Element link :productName)
+					for(int i=0;i<productPrice.size();i++)
 					{
-						String title=link.html();
-						String price=productPrice.get(1).html();
+						System.out.println(productPrice.get(i).text());
+					}
+					for(int i=0;i<productName.size();i++)
+					{
+						String title=productName.get(i).html();
+						String price=productPrice.get(i).text();
+						price=price.replaceAll("優惠價： ", "");
 						String url=productURL.get(0).toString();
 						url=url.substring(url.indexOf("item=")+5, url.indexOf("&amp;page"));
 						url=baseUrl+url;
@@ -261,7 +269,7 @@ public class BooksFinder extends JFrame{
 				pack();
 			}
 
-			private JsonObject ResponceFromJSON(Document Html) {
+			private JsonObject[] ResponceFromJSON(Document Html) {
 				String htmlBodyString=Html.body().toString();
 				htmlBodyString=htmlBodyString.replace("<body>", "");
 				htmlBodyString=htmlBodyString.replace("</body>", "");
@@ -270,7 +278,11 @@ public class BooksFinder extends JFrame{
 				JsonParser parser = new JsonParser();
 				JsonObject contentJSON = (JsonObject)parser.parse(htmlBodyString);
 				JsonArray contentProds=(JsonArray)parser.parse(contentJSON.get("prods").toString());
-				JsonObject contentTemp=(JsonObject)parser.parse(contentProds.get(0).toString());
+				JsonObject []contentTemp=new JsonObject[contentProds.size()];
+				for(int i=0;i<contentTemp.length;i++)
+				{
+					contentTemp[i]=(JsonObject)parser.parse(contentProds.get(i).toString());
+				}
 //					System.out.println(contentTemp.get("name"));
 				return contentTemp;
 			}
