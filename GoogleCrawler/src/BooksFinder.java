@@ -108,6 +108,16 @@ public class BooksFinder extends JFrame{
 						Document Html=Jsoup.connect(SearchURL.EsliteSearch+URLEncoder.encode(keywords.getText(), charset)).userAgent("Mozilla/5.0").timeout(30000).get();
 						Elements productName=Html.select("td.name>h3>a>span");
 						Elements productPrice=Html.select("td.summary>span.price_sale");
+						System.out.println(productName.size());
+						for(int i=0;i<productPrice.size();i++)
+						{
+							String temp=productPrice.get(i).html();
+							if(!temp.contains("元"))
+							{
+								productPrice.remove(i);
+							}
+							//System.out.println(i+" "+productPrice.get(i).html());
+						}
 						Elements productURL=Html.select("td.name>h3");
 						searchResults.setText("誠品網路書店: \n");
 						for(int i =0;i<productName.size();i++)
@@ -121,11 +131,7 @@ public class BooksFinder extends JFrame{
 							String href=url.substring(url.indexOf("\"")+1,url.indexOf(">")-1);
 							//makeURL
 							url=baseURL+href;
-							if(price.contains("折"))
-							{
-								productPrice.remove(i);
-								price=productPrice.get(i).html();
-							}
+							
 							if(title.contains(keywords.getText()))
 							{
 								title=title.replace("<em>", "");
@@ -151,7 +157,11 @@ public class BooksFinder extends JFrame{
 					Elements productName=Html.select("li>a.anchor[title*="+keywords.getText()+"]>span");
 					Elements productURL=Html.select("li>a.anchor[title*="+keywords.getText()+"]");
 					Elements productPrice=Html.select("li>span.price>span.sale_price");					
-					Elements q=productURL.parents();
+					int redundantPrice=productPrice.size()-productName.size();
+					for(int i=0;i<redundantPrice;i++)
+					{
+						productPrice.remove(0);
+					}
 					for (int i = 0; i < productName.size(); i++) {
 						String title = productName.get(i).html();
 						//makeURL
