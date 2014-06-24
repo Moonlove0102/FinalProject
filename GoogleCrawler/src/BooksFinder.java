@@ -237,16 +237,13 @@ public class BooksFinder extends JFrame{
 					Elements productPrice=Html.select("form.result>ul.searchbook>li.item>span.price");
 					searchResults.setText(searchResults.getText()+"\n博客來網路書店: \n");
 					String baseUrl="http://www.books.com.tw/products/";
-					for(int i=0;i<productPrice.size();i++)
-					{
-						System.out.println(productPrice.get(i).text());
-					}
+				
 					for(int i=0;i<productName.size();i++)
 					{
 						String title=productName.get(i).html();
 						String price=productPrice.get(i).text();
 						price=price.replaceAll("優惠價： ", "");
-						String url=productURL.get(0).toString();
+						String url=productURL.get(i).toString();
 						url=url.substring(url.indexOf("item=")+5, url.indexOf("&amp;page"));
 						url=baseUrl+url;
 						if(title.contains(keywords.getText()))
