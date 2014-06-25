@@ -318,6 +318,8 @@ public class BooksFinder extends JFrame{
 								if(linkURL.indexOf(s) != -1)
 									flag = true;
 							}
+							if(!linkURL.endsWith("pdf"))
+								continue;
 							if(flag)
 								continue;
 							searchResults.setText(searchResults.getText()+"Title: "+title+"\n");
